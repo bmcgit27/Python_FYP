@@ -1,0 +1,36 @@
+import os
+import pandas as pd
+
+# Define the source directory and the target Excel file path
+source_dir = r'C:\Users\mccar\OneDrive\Desktop\4th Year\FYP\February\TiN\cleandata'
+target_file = r'C:\Users\mccar\OneDrive\Desktop\4th Year\FYP\February\TiN\Resistances\compile_data.xlsx'
+
+# Initialize a list to store the extracted data
+data = []
+
+# Get a sorted list of all files in the source directory
+# This will list the files in alphabetical order; modify if a different order is needed
+file_list = sorted(os.listdir(source_dir))  
+
+# Iterate through each file in the sorted list
+for file_name in file_list:
+    if file_name.endswith('.csv'):  # Check if the file is a CSV file
+        file_path = os.path.join(source_dir, file_name)  # Construct the full file path
+        df = pd.read_csv(file_path, header=None)  # Read the CSV file into a DataFrame
+        
+        # Check if the file has at least 21 rows to avoid IndexError
+        if len(df) >= 21:
+            # Extract the value from the 21st row, 8th column
+            h21_value = df.iloc[20, 7]  # Adjust indices if necessary
+        else:
+            # If the file has fewer than 21 rows, assign a placeholder value (e.g., None or 'N/A')
+            h21_value = 'N/A'  # You can change 'N/A' to any placeholder value you prefer
+        
+        # Append the file name (without the .csv extension) and the extracted H21 value to the data list
+        data.append({'File Name': file_name.replace('.csv', ''), 'H21 Value': h21_value})
+
+# Convert the list of data into a DataFrame
+compiled_data = pd.DataFrame(data)
+
+# Write the compiled data to the target Excel file
+compiled_data.to_excel(target_file, index=False)
