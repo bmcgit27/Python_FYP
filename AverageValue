@@ -1,0 +1,29 @@
+import os
+import pandas as pd
+
+# Specify the directory containing the CSV files
+source_dir = r'C:\Users\mccar\OneDrive\Desktop\4th Year\FYP\March\brokenchipdata'
+
+# Iterate through each file in the directory
+for file_name in os.listdir(source_dir):
+    # Check if the file is a CSV file
+    if file_name.endswith('.csv'):
+        # Construct the full file path
+        file_path = os.path.join(source_dir, file_name)
+        
+        # Read the CSV file into a DataFrame, assuming no header for direct cell reference
+        df = pd.read_csv(file_path, header=None)
+        
+        # Convert column H (index 7) to numeric, turning non-numeric values to NaN
+        df[7] = pd.to_numeric(df[7], errors='coerce')
+        
+        # Calculate the average of cells from H2 to H42 (ignoring NaN values such as from an empty cell at H22)
+        average_value = df.iloc[1:42, 7].mean()  # 1:42 covers H2 to H42, 7 is column H
+        
+        # Insert the average value into cell K2 (index 1 for zero-based indexing, 10 for column K)
+        if len(df.columns) < 11:  # Ensure there is a column 'K'
+            df[10] = None  # Add column K if it doesn't exist
+        df.at[1, 10] = average_value  # Place the average value at K2
+        
+        # Save the updated DataFrame back to the CSV, without headers
+        df.to_csv(file_path, index=False, header=False)
